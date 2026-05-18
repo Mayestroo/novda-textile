@@ -266,12 +266,21 @@ export default function AboutPage() {
           <div className="space-y-16">
             {t.facility.map((row, index) => {
               const staticRow = translations.uz.facility[index];
+              const imgSrc = index === 0
+                ? '/facility_cutting.png'
+                : index === 1
+                ? '/facility_sewing.png'
+                : index === 2
+                ? '/facility_quality.png'
+                : index === 3
+                ? '/facility_packaging.png'
+                : `https://picsum.photos/seed/${staticRow.seed}/600/400`;
               return (
                 <div key={row.title} className={`grid grid-cols-1 md:grid-cols-2 gap-10 items-center ${!staticRow.imgLeft ? 'md:flex-row-reverse' : ''}`}>
                   {staticRow.imgLeft
-                    ? (<><img src={`https://picsum.photos/seed/${staticRow.seed}/600/400`} alt={row.title} className="rounded-2xl w-full h-64 object-cover shadow-md" />
+                    ? (<><img src={imgSrc} alt={row.title} className="rounded-2xl w-full h-64 object-cover shadow-md" />
                       <div><h3 className="text-2xl font-black text-text mb-4" style={{ fontFamily: 'var(--font-syne)' }}>{row.title}</h3><p className="text-text-muted leading-relaxed">{row.text}</p></div></>)
-                    : (<><div className="md:order-2"><img src={`https://picsum.photos/seed/${staticRow.seed}/600/400`} alt={row.title} className="rounded-2xl w-full h-64 object-cover shadow-md" /></div>
+                    : (<><div className="md:order-2"><img src={imgSrc} alt={row.title} className="rounded-2xl w-full h-64 object-cover shadow-md" /></div>
                       <div className="md:order-1"><h3 className="text-2xl font-black text-text mb-4" style={{ fontFamily: 'var(--font-syne)' }}>{row.title}</h3><p className="text-text-muted leading-relaxed">{row.text}</p></div></>)
                   }
                 </div>
