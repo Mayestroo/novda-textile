@@ -3,6 +3,7 @@
 import AnimatedCounter from '@/components/AnimatedCounter'
 import { useLanguage } from '@/components/LanguageProvider'
 import Link from 'next/link'
+import { useEffect, useRef, useState } from 'react'
 
 const translations = {
   uz: {
@@ -157,9 +158,57 @@ const translations = {
   }
 }
 
+const processImages = {
+  1: '/process_consultation.png',
+  2: '/process_sampling.png',
+  3: '/process_production.png',
+  4: '/process_control.png',
+  5: '/process_packaging.png',
+}
+
 export default function HomePage() {
   const { language } = useLanguage()
   const t = translations[language] || translations.uz
+
+  const [activeStep, setActiveStep] = useState(1)
+  const stepRefs = useRef<(HTMLDivElement | null)[]>([])
+
+  useEffect(() => {
+    const html = document.documentElement
+    html.classList.add('snap-y', 'snap-proximity', 'scroll-smooth')
+    return () => {
+      html.classList.remove('snap-y', 'snap-proximity', 'scroll-smooth')
+    }
+  }, [])
+
+  useEffect(() => {
+    stepRefs.current = stepRefs.current.slice(0, t.steps.length)
+
+    const options = {
+      root: null,
+      rootMargin: '-55% 0px -30% 0px',
+      threshold: 0,
+    }
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const stepNum = Number(entry.target.getAttribute('data-step'))
+          if (stepNum) {
+            setActiveStep(stepNum)
+          }
+        }
+      })
+    }, options)
+
+    stepRefs.current.forEach((ref) => {
+      if (ref) observer.observe(ref)
+    })
+
+    return () => {
+      observer.disconnect()
+    }
+  }, [language, t.steps])
 
   const statsList = [
     { value: 1000000, suffix: '+', label: t.stats.units },
@@ -171,7 +220,7 @@ export default function HomePage() {
   return (
     <>
       {/* Cinematic Hero */}
-      <section className="relative min-h-screen pt-24 pb-12 flex items-center justify-center text-center overflow-hidden" aria-label="Hero section">
+      <section className="relative min-h-screen pt-24 pb-20 flex items-center justify-center text-center overflow-hidden" aria-label="Hero section">
         <div className="absolute inset-0 z-0">
           <img src="https://picsum.photos/seed/textile-dark/1920/1080" alt="Textile manufacturing floor" className="w-full h-full object-cover scale-105 animate-[slowZoom_20s_ease-in-out_infinite_alternate]" />
           <div className="absolute inset-0 bg-background/80 dark:bg-background/90 transition-colors duration-300" />
@@ -181,7 +230,7 @@ export default function HomePage() {
           <h1 className="text-5xl md:text-7xl lg:text-[6rem] font-bold text-text dark:text-white leading-[1.05] mb-8 tracking-tight" style={{ fontFamily: 'var(--font-syne)' }}>
             {t.heroTitle}
           </h1>
-          <p className="text-text-muted dark:text-white/80 text-lg md:text-xl max-w-2xl mb-12 leading-relaxed">
+          <p className="text-text-muted dark:text-white/80 text-lg md:text-xl max-w-2xl mb-8 md:mb-10 leading-relaxed">
             {t.heroDesc}
           </p>
           <div className="flex flex-wrap justify-center gap-4">
@@ -190,7 +239,7 @@ export default function HomePage() {
           </div>
         </div>
         {/* Scroll Indicator */}
-        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-10 animate-bounce opacity-70 hidden sm:block">
+        <div className="absolute bottom-5 left-1/2 -translate-x-1/2 z-10 animate-bounce opacity-70 hidden sm:block">
           <div className="w-7 h-11 rounded-full border-2 border-text-muted/40 dark:border-white/40 flex justify-center pt-2">
             <div className="w-1 h-2.5 bg-text-muted dark:bg-white rounded-full" />
           </div>
@@ -308,25 +357,55 @@ export default function HomePage() {
       {/* Sticky Scroll Process */}
       <section className="bg-background relative" aria-labelledby="process-h2">
         <div className="max-w-7xl mx-auto px-6 py-32">
-          <div className="mb-16 md:mb-24">
+          <div className="mb-16 md:mb-24 text-center">
             <p className="text-xs font-semibold tracking-[0.25em] text-secondary uppercase mb-3">{t.process}</p>
             <h2 id="process-h2" className="text-4xl md:text-5xl font-bold text-text" style={{ fontFamily: 'var(--font-syne)' }}>{t.howWeBuild}</h2>
           </div>
 
           <div className="flex flex-col md:flex-row relative">
-            {/* Sticky Left: Image */}
-            <div className="md:w-1/2 md:sticky md:top-32 h-[50vh] md:h-[60vh] rounded-3xl overflow-hidden mb-12 md:mb-0 shadow-xl">
-              <img src="https://picsum.photos/seed/factory-process/800/1200" alt="Manufacturing process" className="w-full h-full object-cover" />
-              <div className="absolute inset-0 bg-primary/20 mix-blend-multiply" />
+            {/* Sticky Left/Top: Image Container */}
+            <div className="w-full md:w-1/2 sticky top-20 md:top-[calc(50vh-180px)] z-20 bg-background pb-6 md:pb-0 self-start">
+              {/* Aspect Ratio Card */}
+              <div className="aspect-1380/752 w-full rounded-3xl overflow-hidden shadow-xl relative">
+                {[1, 2, 3, 4, 5].map((stepNum) => (
+                  <img
+                    key={stepNum}
+                    src={processImages[stepNum as keyof typeof processImages]}
+                    alt={`Process step ${stepNum}`}
+                    className={`absolute inset-0 w-full h-full object-cover transition-all duration-300 ease-in-out ${activeStep === stepNum
+                      ? 'opacity-100 scale-100 pointer-events-auto'
+                      : 'opacity-0 scale-105 pointer-events-none'
+                      }`}
+                  />
+                ))}
+              </div>
             </div>
 
-            {/* Scrolling Right: Steps */}
-            <div className="md:w-1/2 md:pl-20 lg:pl-32 flex flex-col">
-              {t.steps.map((s) => (
-                <div key={s.title} className="min-h-[50vh] flex flex-col justify-center py-12">
-                  <div className="text-[8rem] md:text-[10rem] font-bold leading-none mb-2" style={{ fontFamily: 'var(--font-syne)', color: 'rgba(16,185,129,0.08)' }}>{s.n}</div>
+            {/* Scrolling Right/Bottom: Steps */}
+            <div className="w-full md:w-1/2 md:px-10 lg:px-20 flex flex-col items-center justify-center relative z-10">
+              {t.steps.map((s, idx) => (
+                <div
+                  key={s.title}
+                  ref={(el) => {
+                    stepRefs.current[idx] = el
+                  }}
+                  data-step={s.n}
+                  className={`min-h-[45vh] md:min-h-[50vh] snap-start md:snap-center scroll-mt-[300px] md:scroll-mt-0 flex flex-col justify-center items-center text-center py-10 md:py-14 transition-all duration-500 ease-out ${activeStep === s.n
+                    ? 'opacity-100 scale-100 translate-y-0'
+                    : 'opacity-20 scale-95 translate-y-4 pointer-events-none'
+                    }`}
+                >
+                  <div
+                    className="text-[8rem] md:text-[10rem] font-bold leading-none mb-2 transition-colors duration-300 select-none pointer-events-none"
+                    style={{
+                      fontFamily: 'var(--font-syne)',
+                      color: activeStep === s.n ? 'rgba(16,185,129,0.25)' : 'rgba(16,185,129,0.03)',
+                    }}
+                  >
+                    {s.n}
+                  </div>
                   <h3 className="text-3xl md:text-4xl font-bold text-text mb-4" style={{ fontFamily: 'var(--font-syne)' }}>{s.title}</h3>
-                  <p className="text-text-muted text-lg leading-relaxed max-w-md">{s.desc}</p>
+                  <p className="text-text-muted text-lg leading-relaxed max-w-md mx-auto">{s.desc}</p>
                 </div>
               ))}
             </div>
