@@ -334,8 +334,8 @@ export default function HomePage() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-y-16 border-b border-border/50 pb-16 mb-16">
             {t.strengths.slice(0, 3).map((s, i) => (
-              <div key={s.title} className={`text-center px-8 ${i !== 2 ? 'md:border-r border-border/50' : ''}`}>
-                <div className="text-4xl mb-4 grayscale opacity-80">{s.icon}</div>
+              <div key={s.title} className={`group text-center px-8 ${i !== 2 ? 'md:border-r border-border/50 border-b border-border/50 pb-16 md:border-b-0 md:pb-0' : ''}`}>
+                <div className="text-4xl mb-4 grayscale opacity-80 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:scale-110">{s.icon}</div>
                 <h3 className="text-secondary font-bold text-2xl mb-2" style={{ fontFamily: 'var(--font-syne)' }}>{s.title}</h3>
                 <p className="text-text-muted text-sm leading-relaxed max-w-xs mx-auto">{s.desc}</p>
               </div>
@@ -344,8 +344,8 @@ export default function HomePage() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-y-16">
             {t.strengths.slice(3, 6).map((s, i) => (
-              <div key={s.title} className={`text-center px-8 ${i !== 2 ? 'md:border-r border-border/50' : ''}`}>
-                <div className="text-4xl mb-4 grayscale opacity-80">{s.icon}</div>
+              <div key={s.title} className={`group text-center px-8 ${i !== 2 ? 'md:border-r border-border/50 border-b border-border/50 pb-16 md:border-b-0 md:pb-0' : ''}`}>
+                <div className="text-4xl mb-4 grayscale opacity-80 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:scale-110">{s.icon}</div>
                 <h3 className="text-secondary font-bold text-2xl mb-2" style={{ fontFamily: 'var(--font-syne)' }}>{s.title}</h3>
                 <p className="text-text-muted text-sm leading-relaxed max-w-xs mx-auto">{s.desc}</p>
               </div>
